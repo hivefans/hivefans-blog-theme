@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>在jekyll博客中如何实现置顶文章功能 - 东杰书屋</title>
+      <meta name="author" content="hivefans">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" >
+      <link rel="canonical" href="blog.djstudy.net/2015/09/24/jekyll%20blog%20article%20sticky/">
+      <link rel="stylesheet" href="/static/css/bootstrap.min.css" media="all">
+      <link rel="stylesheet" href="/static/css/style.css" media="all">
+      <link rel="stylesheet" href="/static/css/pygments.css" media="all">
+      <link rel="stylesheet" href="/static/css/font-awesome.css" media="all">
+
+      <!-- atom & rss feed -->
+      <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="东杰书屋 RSS Feed">
+      <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="东杰书屋 ATOM Feed">
+    </head>
+
+
+  <body>
+    <div class="container">
+    <!--[if lte IE 9]>
+<div class="alert alert-warning">
+  <p>Your Internet Explorer is not supported. Please upgrade your Internet Explorer to version 9+, or use latest <a href="http://www.google.com/chrome/" target="_blank" class="alert-link">Google chrome</a>、<a href="http://www.mozilla.org/firefox/" target="_blank" class="alert-link">Mozilla Firefox</a>.</p>
+  <p>If you are using IE 9 or later, make sure you <a href="http://windows.microsoft.com/en-us/internet-explorer/use-compatibility-view#ie=ie-8" target="_blank" class="alert-link">turn off "Compatibility view"</a>.</p>
+</div>
+<![endif]-->
+<header class="header">
+  <div style="padding-bottom:50px">
+  <ul class="nav navbar-nav visible-lg visible-md">    
+    <li><span class="title"><a href="/" title="东杰书屋">东杰书屋</a></span></li>
+    <li><a href="/archive.html" title="Archive"><span class='fa fa-archive fa-2x'></span></a></li>
+    <li><a href="/categories.html" title="Categories"><span class='fa fa-navicon fa-2x'></span></a></li>
+    <li><a href="/tags.html" title="Tags"><span class='fa fa-tags fa-2x'></span></a></li>
+    <li><a href="/about.html" title="About"><span class='fa fa-user fa-2x'></span></a></li>
+    
+    <li><a href="https://github.com/hivefans" target="_blank" title="Github"><span class='fa fa-github fa-2x'></span></a></li>
+    
+    
+    
+    
+    
+    <li><a href="http://weibo.com/318885373" target="_blank" title="Weibo"><span class="fa fa-weibo fa-2x"></span></a></li>
+    
+    <li><a href="/rss.xml" target="_blank" title="RSS"><span class='fa fa-rss fa-2x'></span></a></li>
+    <li>
+    <form id="search-form" class="form-group has-success visible-lg" role="form">
+      <input type="text" class="form-control input-sm" placeholder="搜索" id="query" style="width: 160px;">
+    </form>
+    </li>
+  </ul>
+ </div>
+</header>
+
+
+      <div class="wrapper">
+        <div class="row">
+          <div id="search-loader" style="display:none;text-align:center">
+            <img src="/static/images/loading.gif">
+          </div>
+          <div class="col-md-12">
+            <article class="news-item">
+
+                <h1  class="news-item"> 在jekyll博客中如何实现置顶文章功能  
+                  <time class="small">2015.09.24</time>
+                </h1>
+
+                <div>
+                <p>最近刚开始用jekyll搭建博客，模板用的<a href="http://blog.javachen.com">javachen的博客</a>模板<br>
+这个模板中实现了大多数博客中的功能</p>
+
+<ul>
+<li>文章评论功能</li>
+<li>标签云tag cloud</li>
+<li>文章read more功能</li>
+</ul>
+
+<p>可是没有实现首页文章置顶功能，网上搜索了一下，找到一个实现方法</p>
+
+<p>在想要置顶文章post中添加一个置顶类</p>
+
+<p>修改index.html模板代码<br>
+<script src="https://gist.github.com/tamouse/a160be1cb467f611c9ba.js"></script></p>
+
+                </div>
+
+
+                <div id="pay" style="text-align:center;">                  
+                  <br>
+                  
+                </div>
+                <div class="copyright">
+<p><strong>本文固定链接：</strong><a href='http://blog.djstudy.net/2015/09/24/jekyll%20blog%20article%20sticky'>http://blog.djstudy.net/2015/09/24/jekyll%20blog%20article%20sticky</a></p>
+<p><strong>原创文章,转载请注明出处：</strong><a href='http://blog.djstudy.net/'>东杰书屋</a></p>
+</div>
+
+                <p class="meta">
+                	
+                      Categories:
+                	    
+                    	<a class="btn btn-default btn-xs" href="/categories.html#devops">devops</a>
+                    
+                	
+
+                	
+                      Tags:
+                	    
+                    	<a class="btn btn-default btn-xs" href="/tags.html#jekyll">jekyll</a>
+                    
+                    	<a class="btn btn-default btn-xs" href="/tags.html#top">top</a>
+                    
+                	
+                </p>
+          	</article>
+
+          	<ul class="pager">
+          	  
+          	  <li class="previous"><a class="btn btn-xs" href="/2015/09/24/ambari%20hdp%20deploy%20spark%20shell%20error" title="ambari hdp中部署apache spark运行spark shell遇到的错误解决">&larr; ambari hdp中部署apache spark运行spark shell遇到的错误解决</a></li>
+          	  
+          	  
+          	  <li class="next"><a class="btn btn-xs" href="/2015/09/24/spark%20on%20yarn" title="spark on yarn">spark on yarn &rarr;</a></li>
+          	  
+          	</ul>
+
+            
+<div id="comments">
+  <div class="ds-thread" data-thread-key="/2015/09/24/jekyll blog article sticky"  data-title="在jekyll博客中如何实现置顶文章功能"></div>
+</div>
+
+
+
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="footer text-center">
+        <p>&copy; 2015<a href="/" target="_blank" title="">hivefans</a> Blog. <a href="https://github.com/javachen/javachen-blog-theme" target="_blank" title="https://github.com/javachen/javachen-blog-theme">Theme</a> build with <a href="//jekyllrb.com/" target="_blank" title="Transform your plain text into static websites and blogs.">Jekyll</a>.
+      	            
+            
+        </p>
+        <div id="toTop" style="display: block;">  <a href="#">▲</a><a href="#footer">▼</a>  </div>
+      </footer>
+
+      <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+      <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="/static/js/core.js"></script>
+      
+      <!-- duoshuo Begin -->
+      <script type="text/javascript">
+        var duoshuoQuery = {short_name:"hivefans"};
+        (function() {
+          var ds = document.createElement('script');
+          ds.type = 'text/javascript';ds.async = true;
+          ds.src = 'http://static.duoshuo.com/embed.js';
+          ds.charset = 'UTF-8';
+          (document.getElementsByTagName('head')[0] ||
+          document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+      </script>
+      <!-- duoshuo End -->
+                 
+       
+
+
+    </div>
+  </body>
+</html>

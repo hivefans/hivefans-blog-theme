@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>Spark Standalone模式HA环境搭建 - 东杰书屋</title>
+      <meta name="author" content="hivefans">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" >
+      <link rel="canonical" href="blog.djstudy.net/2015/09/24/spark%20standalone%20ha/">
+      <link rel="stylesheet" href="/static/css/bootstrap.min.css" media="all">
+      <link rel="stylesheet" href="/static/css/style.css" media="all">
+      <link rel="stylesheet" href="/static/css/pygments.css" media="all">
+      <link rel="stylesheet" href="/static/css/font-awesome.css" media="all">
+
+      <!-- atom & rss feed -->
+      <link href="/rss.xml" type="application/rss+xml" rel="alternate" title="东杰书屋 RSS Feed">
+      <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="东杰书屋 ATOM Feed">
+    </head>
+
+
+  <body>
+    <div class="container">
+    <!--[if lte IE 9]>
+<div class="alert alert-warning">
+  <p>Your Internet Explorer is not supported. Please upgrade your Internet Explorer to version 9+, or use latest <a href="http://www.google.com/chrome/" target="_blank" class="alert-link">Google chrome</a>、<a href="http://www.mozilla.org/firefox/" target="_blank" class="alert-link">Mozilla Firefox</a>.</p>
+  <p>If you are using IE 9 or later, make sure you <a href="http://windows.microsoft.com/en-us/internet-explorer/use-compatibility-view#ie=ie-8" target="_blank" class="alert-link">turn off "Compatibility view"</a>.</p>
+</div>
+<![endif]-->
+<header class="header">
+  <div style="padding-bottom:50px">
+  <ul class="nav navbar-nav visible-lg visible-md">    
+    <li><span class="title"><a href="/" title="东杰书屋">东杰书屋</a></span></li>
+    <li><a href="/archive.html" title="Archive"><span class='fa fa-archive fa-2x'></span></a></li>
+    <li><a href="/categories.html" title="Categories"><span class='fa fa-navicon fa-2x'></span></a></li>
+    <li><a href="/tags.html" title="Tags"><span class='fa fa-tags fa-2x'></span></a></li>
+    <li><a href="/about.html" title="About"><span class='fa fa-user fa-2x'></span></a></li>
+    
+    <li><a href="https://github.com/hivefans" target="_blank" title="Github"><span class='fa fa-github fa-2x'></span></a></li>
+    
+    
+    
+    
+    
+    <li><a href="http://weibo.com/318885373" target="_blank" title="Weibo"><span class="fa fa-weibo fa-2x"></span></a></li>
+    
+    <li><a href="/rss.xml" target="_blank" title="RSS"><span class='fa fa-rss fa-2x'></span></a></li>
+    <li>
+    <form id="search-form" class="form-group has-success visible-lg" role="form">
+      <input type="text" class="form-control input-sm" placeholder="搜索" id="query" style="width: 160px;">
+    </form>
+    </li>
+  </ul>
+ </div>
+</header>
+
+
+      <div class="wrapper">
+        <div class="row">
+          <div id="search-loader" style="display:none;text-align:center">
+            <img src="/static/images/loading.gif">
+          </div>
+          <div class="col-md-12">
+            <article class="news-item">
+
+                <h1  class="news-item"> Spark Standalone模式HA环境搭建  
+                  <time class="small">2015.09.24</time>
+                </h1>
+
+                <div>
+                <p>Spark Standalone模式常见的HA部署方式有两种：基于文件系统的HA和基于ZK的HA </p>
+
+<p>本篇只介绍基于ZK的HA环境搭建：</p>
+
+<p>$SPARK_HOME/conf/spark-env.sh</p>
+
+<p>添加SPARK_DAEMON_JAVA_OPTS的配置信息：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">export SPARK_DAEMON_JAVA_OPTS=&quot;-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url=hadoop000:2181,hadoop001:2181,hadoop002:2181 -Dspark.deploy.zookeeper.dir=/spark&quot;
+</code></pre></div>
+<p>配置参数说明：</p>
+
+<p>spark.deploy.recoveryMode: 设置恢复模式为zk，默认为NONE</p>
+
+<p>spark.deploy.zookeeper.url: 设置ZK集群的url，形如：192.168.1.100:2181,192.168.1.101:2181</p>
+
+<p>spark.deploy.zookeeper.dir: 设置zk保存恢复状态的路径，默认为spark</p>
+
+<p>实现HA的原理：利用ZK的Leader Election机制，选择一个Active状态的Master，其余的Master均为Standby状态；当Active状态的Master死掉后，通过ZK选举一个Standby状态的Master为Active状态。</p>
+
+<p>测试步骤：</p>
+
+<p>启动standalone集群后，在各个Standby节点上启动start-master.sh，jps观察是否已经正确启动Master进程；</p>
+
+<p>将Active状态的Master kill掉，观察8080端口对应的页面，发现已经从Standby状态中选举出一个当作Active状态。</p>
+
+<p>采用ZK后由于会有多个Master，在提交任务时不知道哪个为Active状态的Master，可以采用如下的方式提交：</p>
+
+<p>spark-shell --master spark://hadoop000:7077,hadoop001:7077,hadoop002:7077 --executor-memory 2g --total-executor-cores 1</p>
+
+<p>详细信息参见官方文档：<a href="http://spark.apache.org/docs/latest/spark-standalone.html#standby-masters-with-zookeeper">http://spark.apache.org/docs/latest/spark-standalone.html#standby-masters-with-zookeeper</a></p>
+
+                </div>
+
+
+                <div id="pay" style="text-align:center;">                  
+                  <br>
+                  
+                </div>
+                <div class="copyright">
+<p><strong>本文固定链接：</strong><a href='http://blog.djstudy.net/2015/09/24/spark%20standalone%20ha'>http://blog.djstudy.net/2015/09/24/spark%20standalone%20ha</a></p>
+<p><strong>原创文章,转载请注明出处：</strong><a href='http://blog.djstudy.net/'>东杰书屋</a></p>
+</div>
+
+                <p class="meta">
+                	
+                      Categories:
+                	    
+                    	<a class="btn btn-default btn-xs" href="/categories.html#spark">spark</a>
+                    
+                	
+
+                	
+                      Tags:
+                	    
+                    	<a class="btn btn-default btn-xs" href="/tags.html#spark">spark</a>
+                    
+                    	<a class="btn btn-default btn-xs" href="/tags.html#HA">HA</a>
+                    
+                	
+                </p>
+          	</article>
+
+          	<ul class="pager">
+          	  
+          	  <li class="previous"><a class="btn btn-xs" href="/2015/09/24/spark%20on%20yarn" title="spark on yarn">&larr; spark on yarn</a></li>
+          	  
+          	  
+          	  <li class="next disabled"><a class="btn btn-xs" href="#">Next &rarr;</a></li>
+          	  
+          	</ul>
+
+            
+<div id="comments">
+  <div class="ds-thread" data-thread-key="/2015/09/24/spark standalone ha"  data-title="Spark Standalone模式HA环境搭建"></div>
+</div>
+
+
+
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="footer text-center">
+        <p>&copy; 2015<a href="/" target="_blank" title="">hivefans</a> Blog. <a href="https://github.com/javachen/javachen-blog-theme" target="_blank" title="https://github.com/javachen/javachen-blog-theme">Theme</a> build with <a href="//jekyllrb.com/" target="_blank" title="Transform your plain text into static websites and blogs.">Jekyll</a>.
+      	            
+            
+        </p>
+        <div id="toTop" style="display: block;">  <a href="#">▲</a><a href="#footer">▼</a>  </div>
+      </footer>
+
+      <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+      <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="/static/js/core.js"></script>
+      
+      <!-- duoshuo Begin -->
+      <script type="text/javascript">
+        var duoshuoQuery = {short_name:"hivefans"};
+        (function() {
+          var ds = document.createElement('script');
+          ds.type = 'text/javascript';ds.async = true;
+          ds.src = 'http://static.duoshuo.com/embed.js';
+          ds.charset = 'UTF-8';
+          (document.getElementsByTagName('head')[0] ||
+          document.getElementsByTagName('body')[0]).appendChild(ds);
+        })();
+      </script>
+      <!-- duoshuo End -->
+                 
+       
+
+
+    </div>
+  </body>
+</html>

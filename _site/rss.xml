@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <channel>
+    <title>东杰书屋</title>
+    <description></description>
+    <link>blog.djstudy.net/rss.xml</link>
+    <lastBuildDate>2015-09-24T16:50:53+08:00</lastBuildDate>
+    <pubDate>2015-09-24T16:50:53+08:00</pubDate>
+    <ttl>1800</ttl>
+
+    
+    <item>
+      <title>Spark Standalone模式HA环境搭建</title>
+      <description>&lt;p&gt;Spark Standalone模式常见的HA部署方式有两种：基于文件系统的HA和基于ZK的HA &lt;/p&gt;
+
+&lt;p&gt;本篇只介绍基于ZK的HA环境搭建：&lt;/p&gt;
+
+&lt;p&gt;$SPARK_HOME/conf/spark-env.sh&lt;/p&gt;
+
+&lt;p&gt;添加SPARK_DAEMON_JAVA_OPTS的配置信息：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;export SPARK_DAEMON_JAVA_OPTS=&amp;quot;-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url=hadoop000:2181,hadoop001:2181,hadoop002:2181 -Dspark.deploy.zookeeper.dir=/spark&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;配置参数说明：&lt;/p&gt;
+
+&lt;p&gt;spark.deploy.recoveryMode: 设置恢复模式为zk，默认为NONE&lt;/p&gt;
+
+&lt;p&gt;spark.deploy.zookeeper.url: 设置ZK集群的url，形如：192.168.1.100:2181,192.168.1.101:2181&lt;/p&gt;
+
+&lt;p&gt;spark.deploy.zookeeper.dir: 设置zk保存恢复状态的路径，默认为spark&lt;/p&gt;
+
+&lt;p&gt;实现HA的原理：利用ZK的Leader Election机制，选择一个Active状态的Master，其余的Master均为Standby状态；当Active状态的Master死掉后，通过ZK选举一个Standby状态的Master为Active状态。&lt;/p&gt;
+
+&lt;p&gt;测试步骤：&lt;/p&gt;
+
+&lt;p&gt;启动standalone集群后，在各个Standby节点上启动start-master.sh，jps观察是否已经正确启动Master进程；&lt;/p&gt;
+
+&lt;p&gt;将Active状态的Master kill掉，观察8080端口对应的页面，发现已经从Standby状态中选举出一个当作Active状态。&lt;/p&gt;
+
+&lt;p&gt;采用ZK后由于会有多个Master，在提交任务时不知道哪个为Active状态的Master，可以采用如下的方式提交：&lt;/p&gt;
+
+&lt;p&gt;spark-shell --master spark://hadoop000:7077,hadoop001:7077,hadoop002:7077 --executor-memory 2g --total-executor-cores 1&lt;/p&gt;
+
+&lt;p&gt;详细信息参见官方文档：&lt;a href=&quot;http://spark.apache.org/docs/latest/spark-standalone.html#standby-masters-with-zookeeper&quot;&gt;http://spark.apache.org/docs/latest/spark-standalone.html#standby-masters-with-zookeeper&lt;/a&gt;&lt;/p&gt;
+</description>
+      <link>blog.djstudy.net/2015/09/24/spark%20standalone%20ha/</link>
+      <guid>blog.djstudy.net/2015/09/24/spark standalone ha/</guid>
+      <pubDate>2015-09-24T00:00:00+08:00</pubDate>
+    </item>
+    
+    <item>
+      <title>spark on yarn</title>
+      <description>&lt;p&gt;为什么要使用YARN?&lt;/p&gt;
+
+&lt;p&gt;数据共享、资源利用率、更方便的管理集群等。&lt;/p&gt;
+
+&lt;p&gt;详情参见：&lt;a href=&quot;http://www.cnblogs.com/luogankun/p/3887019.html&quot;&gt;http://www.cnblogs.com/luogankun/p/3887019.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Spark YARN版本编译&lt;/p&gt;
+
+&lt;p&gt;编译hadoop对应的支持YARN的Spark版本&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;export MAVEN_OPTS=&amp;quot;-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m&amp;quot;
+mvn clean package -DskipTests -Phadoop-2.3 -Dhadoop.version=2.3.0-cdh5.0.0 -Dprotobuf.version=2.5.0 -Pyarn -Phive
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;详情参见：&lt;a href=&quot;http://www.cnblogs.com/luogankun/p/3798403.html&quot;&gt;http://www.cnblogs.com/luogankun/p/3798403.html&lt;/a&gt;&lt;br&gt;
+Spark On YARN&lt;/p&gt;
+
+&lt;p&gt;Spark的Cluster Manager负责管理启动executor进程，集群可以是Standalone、YARN和Mesos&lt;/p&gt;
+
+&lt;p&gt;每个SparkContext（换句话说是：Application）对应一个ApplicationMaster（Application启动过程中的第一个容器&lt;/p&gt;
+
+&lt;p&gt;ApplicationMaster负责和ResourceManager打交道，并请求资源，当获取资源之后通知NodeManager为其启动container； 每个Container中运行一个ExecutorBackend&lt;/p&gt;
+
+&lt;p&gt;ResourceManager决定哪些Application可以运行、什么时候运行以及在哪些NodeManager上运行； NodeManager的Container上运行executor进程&lt;/p&gt;
+
+&lt;p&gt;在Standalone模式中有Worker的概念，而在Spark On YARN中没有Worker的概念&lt;/p&gt;
+
+&lt;p&gt;由于executor是运行在container中，故container内存要大于executor的内存&lt;/p&gt;
+
+&lt;p&gt;Spark On YARN有两种：&lt;/p&gt;
+
+&lt;p&gt;1、yarn-client&lt;/p&gt;
+
+&lt;p&gt;　　Client和Driver运行在一起，ApplicationMaster只负责获取资源&lt;/p&gt;
+
+&lt;p&gt;　　Client会和请求到的资源container通信来调度他们进行工作，也就是说Client不能退出滴；&lt;/p&gt;
+
+&lt;p&gt;　　日志信息输出能输出在终端控制台上，适用于交互或者调试，也就是希望快速地看到application的输出，比如SparkStreaming&lt;br&gt;
+&lt;img src=&quot;/static/images/161514368446695.png&quot; alt=&quot;yarn-client&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;2、yarn-cluster&lt;/p&gt;
+
+&lt;p&gt;　　Driver和ApplicationMaster运行在一起；负责向YARN申请资源，并检测作业的运行状况；executor运行在container中&lt;/p&gt;
+
+&lt;p&gt;　　提交Application之后，即使关掉了Client，作业仍然会继续在YARN上运行&lt;/p&gt;
+
+&lt;p&gt;　　日志信息不会输出在终端控制台上&lt;br&gt;
+&lt;img src=&quot;/static/images/161515016875485.png&quot; alt=&quot;yarn-cluster&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;提交Spark作业到YARN&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;提交命令&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;./bin/spark-submit \
+  --class &amp;lt;main-class&amp;gt;
+  --master &amp;lt;master-url&amp;gt; \
+  --deploy-mode &amp;lt;deploy-mode&amp;gt; \
+  ... # other options
+  &amp;lt;application-jar&amp;gt; \
+  [application-arguments]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;1、提交本地jar&lt;/p&gt;
+
+&lt;p&gt;提交到yarn-cluster/yarn-client&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;./bin/spark-submit \
+  --class org.apache.spark.examples.SparkPi \
+  --master yarn-cluster \  # can also be `yarn-client` for client mode
+  --executor-memory 20G \
+  --num-executors 50 \
+  /path/to/examples.jar \
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;如果采用的是yarn-cluster的方式运行的话，想停止执行应用，需要去多个node上干掉；而在yarn-client模式运行时，只需要在client上干掉应用即可。&lt;/p&gt;
+
+&lt;p&gt;提交到standalone&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;./bin/spark-submit \
+  --class org.apache.spark.examples.SparkPi \
+  --master spark://207.184.161.138:7077 \
+  --executor-memory 20G \
+  --total-executor-cores 100 \
+  /path/to/examples.jar \
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;2、提交hdfs上的jar&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;./bin/spark-submit \
+  --class org.apache.spark.examples.SparkPi \
+  --master yarn-cluster \  # can also be `yarn-client` for client mode
+  --executor-memory 20G \
+  --num-executors 50 \
+  hdfs://hadoop000:8020/lib/examples.jar \
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;如果没有在spark-env.sh文件中配置HADOOP_CONF_DIR或者YARN_CONF_DIR，可以在提交作业前指定形如&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;export HADOOP_CONF_DIR=XXX
+./bin/spark-submit \
+  --class org.apache.spark.examples.SparkPi \
+  --master yarn-cluster \  # can also be `yarn-client` for client mode
+  --executor-memory 20G \
+  --num-executors 50 \
+  /path/to/examples.jar \
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;详情参见：&lt;a href=&quot;http://spark.apache.org/docs/latest/submitting-applications.html&quot;&gt;http://spark.apache.org/docs/latest/submitting-applications.html&lt;/a&gt;&lt;/p&gt;
+</description>
+      <link>blog.djstudy.net/2015/09/24/spark%20on%20yarn/</link>
+      <guid>blog.djstudy.net/2015/09/24/spark on yarn/</guid>
+      <pubDate>2015-09-24T00:00:00+08:00</pubDate>
+    </item>
+    
+    <item>
+      <title>在jekyll博客中如何实现置顶文章功能</title>
+      <description>&lt;p&gt;最近刚开始用jekyll搭建博客，模板用的&lt;a href=&quot;http://blog.javachen.com&quot;&gt;javachen的博客&lt;/a&gt;模板&lt;br&gt;
+这个模板中实现了大多数博客中的功能&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;文章评论功能&lt;/li&gt;
+&lt;li&gt;标签云tag cloud&lt;/li&gt;
+&lt;li&gt;文章read more功能&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;可是没有实现首页文章置顶功能，网上搜索了一下，找到一个实现方法&lt;/p&gt;
+
+&lt;p&gt;在想要置顶文章post中添加一个置顶类&lt;/p&gt;
+
+&lt;p&gt;修改index.html模板代码&lt;br&gt;
+&lt;script src=&quot;https://gist.github.com/tamouse/a160be1cb467f611c9ba.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+</description>
+      <link>blog.djstudy.net/2015/09/24/jekyll%20blog%20article%20sticky/</link>
+      <guid>blog.djstudy.net/2015/09/24/jekyll blog article sticky/</guid>
+      <pubDate>2015-09-24T00:00:00+08:00</pubDate>
+    </item>
+    
+    <item>
+      <title>ambari hdp中部署apache spark运行spark shell遇到的错误解决</title>
+      <description>&lt;p&gt;在运行spark-shell中遇到的ERROR lzo.GPLNativeCodeLoader: Could not load native gpl library  解决方法&lt;/p&gt;
+
+&lt;p&gt;bin/spark-shell --driver-library-path :/usr/hdp/2.2.4.2-2/hadoop/lib/native/Linux-amd64-64:/usr/hdp/2.2.4.2-2/hadoop/lib/hadoop-lzo-0.6.0.2.2.4.2-2.jar&lt;/p&gt;
+
+&lt;p&gt;在运行spark-shell中遇到的Compression codec com.hadoop.compression.lzo.LzoCodec not found  错误可以配置文件spark-defaults.conf&lt;br&gt;
+  spark.executor.extraClassPath    /usr/hdp/2.2.4.2-2/hadoop/lib/hadoop-lzo-0.6.0.2.2.4.2-2.jar&lt;br&gt;
+  spark.driver.extraClassPath      /usr/hdp/2.2.4.2-2/hadoop/lib/hadoop-lzo-0.6.0.2.2.4.2-2.jar&lt;br&gt;
+保存文件重启spark服务集群即可。&lt;/p&gt;
+
+&lt;p&gt;再提供一个Unable to load native-hadoop library 和 Snappy native library not loaded的解决方案。这个问题主要是jre目录下缺少了libgplcompression.so , libhadoop.so和libsnappy.so两个文件。具体是，spark-shell依赖的是scala，scala依赖的是JAVA_HOME下的jdk，libhadoop.so和libsnappy.so两个文件应该放到JAVA_HOME/jre/lib/amd64下面。要注意的是要知道真正依赖到的JAVA_HOME是哪一个，把两个.so放对地方。这两个so：libhadoop.so和libsnappy.so。前一个so可以在HADOOP_HOME下找到，比如hadoop\lib\native\Linux-amd64-64。第二个libsnappy.so需要下载一个snappy-1.1.0.tar.gz，然后./configure，make编译出来。snappy是google的一个压缩算法，在hadoop jira下&lt;a href=&quot;https://issues.apache.org/jira/browse/HADOOP-7206%E8%AE%B0%E5%BD%95%E4%BA%86%E8%BF%99%E6%AC%A1%E9%9B%86%E6%88%90%E3%80%82&quot;&gt;https://issues.apache.org/jira/browse/HADOOP-7206记录了这次集成。&lt;/a&gt;&lt;/p&gt;
+</description>
+      <link>blog.djstudy.net/2015/09/24/ambari%20hdp%20deploy%20spark%20shell%20error/</link>
+      <guid>blog.djstudy.net/2015/09/24/ambari hdp deploy spark shell error/</guid>
+      <pubDate>2015-09-24T00:00:00+08:00</pubDate>
+    </item>
+    
+  </channel>
+</rss>

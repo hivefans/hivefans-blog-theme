@@ -1,0 +1,67 @@
+---
+layout: default
+---
+<div class="col-md-9">
+  {% assign index = true %}
+  <!-- add this section to put sticky posts on page 1 -->
+  {% if paginator.page == 1 %}
+    {% for post in site.categories.sticky %}
+    {% assign content = post.content %}
+   <article class="news-item">
+      <h3><a href="{{ post.url }}"> [置顶] {{ post.title }}</a><small>  {{ post.date  | date: "%Y.%m.%d" }}</small></h3>
+      {{ post.description }}
+    </article>
+    {% endfor %}
+  {% endif %}
+
+  {% for post in paginator.posts %}
+  <!-- this next section is used to see if the post is sticky, in which case it's already been shown -->
+    {% assign sticky = false %}
+    {% for cat in post.categories %} <!-- roll through this pages categories to find if it is sticky -->
+      {% if cat == 'sticky' %}
+        {% assign sticky = true %}
+      {% endif %}
+    {% endfor %}
+    {% unless sticky %} <!-- only show the article if it is NOT sticky -->
+      {% assign content = post.content %}
+    <article class="news-item">
+      <h3><a href="{{ post.url }}">{{ post.title }}</a><small>  {{ post.date  | date: "%Y.%m.%d" }}</small></h3>
+
+      {{ post.description }}
+    </article>    
+    {% endunless %}
+  {% endfor %}
+  <br/>
+
+  <!-- Pagination links -->
+  <div class="pull-right">
+    {% if paginator.previous_page %}
+    {% if paginator.previous_page == 1 %}
+    <a class="btn btn-default btn-xs" href="/">Home</a>
+    <a class="btn btn-default btn-xs" href="/">&laquo; Prev</a>
+    {% else %}
+    <a class="btn btn-default btn-xs" href="/">Home</a>
+    <a class="btn btn-default btn-xs" href="/page{{paginator.previous_page}}/">&laquo; Prev</a>
+    {% endif %}
+    {% else %}
+    <span><a class="btn btn-default btn-xs disabled" href="/">Home</a></span>
+    <span><a class="btn btn-default btn-xs disabled">&laquo; Prev</a></span>
+    {% endif %}
+    <span><a class="btn btn-default btn-xs disabled">Page: {{paginator.page}} of {{paginator.total_pages}}</a></span>
+    {% if paginator.next_page %}
+    <a class="btn btn-default btn-xs" href="/page{{paginator.next_page}}/">Next &raquo;</a>
+    <a class="btn btn-default btn-xs" href="/page{{paginator.total_pages}}/">Last</a>
+    {% else if paginator.page == paginator.total_pages %}
+    <span><a class="btn btn-default btn-xs disabled">Next &raquo;</a></span>
+    <span><a class="btn btn-default btn-xs disabled">Last</a></span>
+    {% endif %}
+  </div>
+</div>
+<div class="col-md-3 visible-lg visible-md">
+  {% include categories.html %}
+  {% include recently_posts.html %}
+  {% include recently_comments.html %}
+  {% include blogroll.html %}
+  {% include support.html %}
+</div>
+<div class="clearfix"></div>

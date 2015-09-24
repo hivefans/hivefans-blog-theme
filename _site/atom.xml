@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>东杰书屋</title>
+  <link href="//atom.xml" rel="self"/>
+  <link href=""/>
+  <updated>2015-09-24T16:50:53+08:00</updated>
+  <id></id>
+  <author>
+    <name>hivefans</name>
+  </author>
+
+  
+  <entry>
+    <title>Spark Standalone模式HA环境搭建</title>
+    <link href="/2015/09/24/spark%20standalone%20ha/"/>
+    <updated>2015-09-24T00:00:00+08:00</updated>
+    <id>/2015/09/24/spark standalone ha</id>
+    <content type="html">Spark Standalone模式常见的HA部署方式有两种：基于文件系统的HA和基于ZK的HA 
+
+本篇只介绍基于ZK的HA环境搭建：
+
+$SPARK_HOME/conf/spark-env.sh
+
+添加SPARK_DAEMON_JAVA_OPTS的配置信息：
+export SPARK_DAEMON_JAVA_OPTS=&amp;quot;-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url=hadoop000:2181,hadoop001:2181,hadoop002:2181 -Dspark.deploy.zo...</content>
+  </entry>
+  
+  <entry>
+    <title>spark on yarn</title>
+    <link href="/2015/09/24/spark%20on%20yarn/"/>
+    <updated>2015-09-24T00:00:00+08:00</updated>
+    <id>/2015/09/24/spark on yarn</id>
+    <content type="html">为什么要使用YARN?
+
+数据共享、资源利用率、更方便的管理集群等。
+
+详情参见：http://www.cnblogs.com/luogankun/p/3887019.html
+
+Spark YARN版本编译
+
+编译hadoop对应的支持YARN的Spark版本
+export MAVEN_OPTS=&amp;quot;-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m&amp;quot;
+mvn clean package -DskipTests -Phadoop-2.3 -Dhadoop.version=2.3.0-cdh5.0.0 -...</content>
+  </entry>
+  
+  <entry>
+    <title>在jekyll博客中如何实现置顶文章功能</title>
+    <link href="/2015/09/24/jekyll%20blog%20article%20sticky/"/>
+    <updated>2015-09-24T00:00:00+08:00</updated>
+    <id>/2015/09/24/jekyll blog article sticky</id>
+    <content type="html">最近刚开始用jekyll搭建博客，模板用的javachen的博客模板
+这个模板中实现了大多数博客中的功能
+
+
+文章评论功能
+标签云tag cloud
+文章read more功能
+
+
+可是没有实现首页文章置顶功能，网上搜索了一下，找到一个实现方法
+
+在想要置顶文章post中添加一个置顶类
+
+修改index.html模板代码
+
+</content>
+  </entry>
+  
+  <entry>
+    <title>ambari hdp中部署apache spark运行spark shell遇到的错误解决</title>
+    <link href="/2015/09/24/ambari%20hdp%20deploy%20spark%20shell%20error/"/>
+    <updated>2015-09-24T00:00:00+08:00</updated>
+    <id>/2015/09/24/ambari hdp deploy spark shell error</id>
+    <content type="html">在运行spark-shell中遇到的ERROR lzo.GPLNativeCodeLoader: Could not load native gpl library  解决方法
+
+bin/spark-shell --driver-library-path :/usr/hdp/2.2.4.2-2/hadoop/lib/native/Linux-amd64-64:/usr/hdp/2.2.4.2-2/hadoop/lib/hadoop-lzo-0.6.0.2.2.4.2-2.jar
+
+在运行spark-shell中遇到的Compression codec com.hadoop.compres...</content>
+  </entry>
+  
+</feed>
